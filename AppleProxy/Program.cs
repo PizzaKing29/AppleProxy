@@ -22,9 +22,9 @@ class Proxy
 
             while (true)
             {
-                httpListener.GetContext();
+                // httpListener.GetContext();
                 Console.WriteLine("Recieved HTTP Request");
-                ReverseProxy();
+                ReverseProxy(httpListener.GetContext());
             }
         }
         catch (Exception e)
@@ -34,17 +34,17 @@ class Proxy
     }
 
 
-    public static void ReverseProxy()
+    public static void ReverseProxy(HttpListenerContext httpListenerContext)
     {
         // when program detects a http request on port 8001, GET http request stuff form port 8000
         string baseUrl = "http://localhost:8000/";
         HttpClient httpClient = new HttpClient();
-        byte[] data = new byte[10000];
-        Stream stream;
+        HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
 
-        var request = httpClient.GetAsync(baseUrl);
+        var request = httpClient.GetStreamAsync(baseUrl);
 
         Console.WriteLine("I think it worked");
-        Console.WriteLine($"Request Message: {request}");
+        Console.WriteLine($"Listener Context: {httpListenerContext}");
+        Console.WriteLine($"Listener Response: {httpListenerResponse}");
     }
 }
