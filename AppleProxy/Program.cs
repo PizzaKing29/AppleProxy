@@ -42,9 +42,11 @@ class Proxy
         HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
 
         var request = httpClient.GetStreamAsync(baseUrl);
+        var outputStream = httpListenerResponse.OutputStream;
 
         Console.WriteLine("I think it worked");
         Console.WriteLine($"Listener Context: {httpListenerContext}");
         Console.WriteLine($"Listener Response: {httpListenerResponse}");
+        Console.WriteLine($"Listener Response Output Stream: {httpListenerResponse.OutputStream}");
     }
 }
