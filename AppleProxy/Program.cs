@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace AppleProxy;
 
@@ -22,7 +23,6 @@ class Proxy
 
             while (true)
             {
-                // httpListener.GetContext();
                 Console.WriteLine("Recieved HTTP Request");
                 ReverseProxy(httpListener.GetContext());
             }
@@ -32,21 +32,19 @@ class Proxy
             Console.WriteLine($"Error {e}");
         }
     }
+    // GET request to the backend, then forward it to the client
 
-
-    public static void ReverseProxy(HttpListenerContext httpListenerContext)
+    public static async Task ReverseProxy(HttpListenerContext httpListenerContext)
     {
-        // when program detects a http request on port 8001, GET http request stuff form port 8000
-        string baseUrl = "http://localhost:8000/";
-        HttpClient httpClient = new HttpClient();
+        string baseUrl = "http://localhost:8000/"; // backend URL
+        string clientUrl = "http://localhost:8000/"; // client URL
+        HttpClient httpClient = new HttpClient(); // send and recieve HTTP responses
         HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
 
-        var request = httpClient.GetStreamAsync(baseUrl);
+        var request = await httpClient.GetStreamAsync(baseUrl);
         var outputStream = httpListenerResponse.OutputStream;
+        await request.CopyToAsync(outputStream); // send back request to client
 
-        Console.WriteLine("I think it worked");
-        Console.WriteLine($"Listener Context: {httpListenerContext}");
-        Console.WriteLine($"Listener Response: {httpListenerResponse}");
-        Console.WriteLine($"Listener Response Output Stream: {httpListenerResponse.OutputStream}");
+        Console.WriteLine("Worked");
     }
 }
