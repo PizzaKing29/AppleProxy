@@ -46,5 +46,6 @@ class Proxy
         await request.CopyToAsync(outputStream); // send back request to client
 
         Console.WriteLine("Worked");
+        httpListenerResponse.Close(); // shutdown client
     }
 }
