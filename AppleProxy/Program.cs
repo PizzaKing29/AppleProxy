@@ -32,18 +32,28 @@ class Proxy
             Console.WriteLine($"Error {e}");
         }
     }
-    // GET request to the backend, then forward it to the client
 
     public static async Task ReverseProxy(HttpListenerContext httpListenerContext)
     {
+        // HttpListener  == Client > Proxy
+        // HttpClient == Proxy > Backend
+
         string baseUrl = "http://localhost:8000/"; // backend URL
-        string clientUrl = "http://localhost:8000/"; // client URL
+        string clientUrl = "http://localhost:8001/"; // client URL
         HttpClient httpClient = new HttpClient(); // send and recieve HTTP responses
         HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
+
 
         var request = await httpClient.GetStreamAsync(baseUrl);
         var outputStream = httpListenerResponse.OutputStream;
         await request.CopyToAsync(outputStream); // send back request to client
+
+
+        // send back the HTTP response code
+        var getRequestTask = await httpClient.GetAsync(baseUrl);
+        var statusCode = getRequestTask.StatusCode;
+        httpListenerResponse.StatusCode = (int) statusCode; 
+
 
         Console.WriteLine("Worked");
         httpListenerResponse.Close(); // shutdown client
