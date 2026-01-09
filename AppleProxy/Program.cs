@@ -57,5 +57,7 @@ class Proxy
 
         Console.WriteLine("Worked");
         httpListenerResponse.Close(); // shutdown client
+
+        // TODO: add port avalibility and custom web url
     }
 }
