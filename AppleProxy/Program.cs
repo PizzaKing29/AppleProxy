@@ -6,12 +6,12 @@ namespace AppleProxy;
 
 class Proxy
 {
-    public static void Main()
+    public static async Task Main()
     {
-        HttpListenRequests();
+        await HttpListenRequests();
     }
 
-    public static async void HttpListenRequests()
+    public static async Task HttpListenRequests()
     {
         try
         {
