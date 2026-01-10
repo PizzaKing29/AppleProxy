@@ -8,7 +8,7 @@ class Proxy
 {
     public static async Task Main()
     {
-        await HttpListenRequests();
+        await HttpListenRequests(); // await to not stop during loop
     }
 
     public static async Task HttpListenRequests()
