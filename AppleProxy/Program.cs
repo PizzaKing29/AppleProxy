@@ -11,20 +11,25 @@ class Proxy
         HttpListenRequests();
     }
 
-    public static void HttpListenRequests()
+    public static async void HttpListenRequests()
     {
         try
         {
+            string backendUrl = "http://localhost:8000/"; // backend URL
+            string clientUrl = "http://localhost:8001/"; // client URL
+
+
             HttpListener httpListener = new HttpListener();
-            httpListener.Prefixes.Add("http://localhost:8001/");
+            httpListener.Prefixes.Add(clientUrl);
 
             httpListener.Start();
             Console.WriteLine("Started listening for HTTP requests");
 
+
             while (true)
             {
                 Console.WriteLine("Recieved HTTP Request");
-                ReverseProxy(httpListener.GetContext());
+                await ReverseProxy(httpListener.GetContext(), backendUrl);
             }
         }
         catch (Exception e)
@@ -33,31 +38,32 @@ class Proxy
         }
     }
 
-    public static async Task ReverseProxy(HttpListenerContext httpListenerContext)
+    public static async Task ReverseProxy(HttpListenerContext httpListenerContext, string backendUrl)
     {
         // HttpListener  == Client > Proxy
         // HttpClient == Proxy > Backend
-
-        string baseUrl = "http://localhost:8000/"; // backend URL
-        string clientUrl = "http://localhost:8001/"; // client URL
-        HttpClient httpClient = new HttpClient(); // send and recieve HTTP responses
-        HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
-
-
-        var request = await httpClient.GetStreamAsync(baseUrl);
-        var outputStream = httpListenerResponse.OutputStream;
-        await request.CopyToAsync(outputStream); // send back request to client
+        
+        try
+        {
+            HttpClient httpClient = new HttpClient(); // send and recieve HTTP responses
+            HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
 
 
-        // send back the HTTP response code
-        var getRequestTask = await httpClient.GetAsync(baseUrl);
-        var statusCode = getRequestTask.StatusCode;
-        httpListenerResponse.StatusCode = (int) statusCode; 
+            var request = await httpClient.GetAsync(backendUrl);
+            var outputStream = httpListenerResponse.OutputStream;
+            await request.Content.CopyToAsync(outputStream); // send back request to client
+
+            // send back the HTTP response code
+            var statusCode = request.StatusCode;
+            httpListenerResponse.StatusCode = (int) statusCode; 
 
 
-        Console.WriteLine("Worked");
-        httpListenerResponse.Close(); // shutdown client
-
-        // TODO: add port avalibility and custom web url
+            Console.WriteLine("Sucessfully sent back HTTP response code and the HTTP response");
+            httpListenerResponse.Close(); // shutdown client
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error {e}");
+        }
     }
 }
