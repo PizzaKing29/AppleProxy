@@ -53,9 +53,17 @@ class Proxy
             var outputStream = httpListenerResponse.OutputStream;
             await request.Content.CopyToAsync(outputStream); // send back request to client
 
+
+            var header = request.Content.Headers;
+
+            var contentType = header.ContentType; // represents media type
+            var contentLength = header.ContentLength; // size of message body in bytes
+
+
             // send back the HTTP response code
             var statusCode = request.StatusCode;
-            httpListenerResponse.StatusCode = (int) statusCode; 
+            httpListenerResponse.StatusCode = (int) statusCode;
+
 
 
             Console.WriteLine("Sucessfully sent back HTTP response code and the HTTP response");
