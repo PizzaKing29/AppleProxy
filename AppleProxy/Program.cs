@@ -49,7 +49,11 @@ class Proxy
             HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
 
 
-            var request = await httpClient.GetAsync(backendUrl);
+            var clientRequest = httpListenerContext.Request;
+            byte[] buffer = new byte[8192];
+            var request = await clientRequest.InputStream.ReadAsync(buffer, 0, 8192);
+
+            var zcxv = await httpClient.GetAsync(backendUrl);
             var outputStream = httpListenerResponse.OutputStream;
             await request.Content.CopyToAsync(outputStream); // send back request to client
 
