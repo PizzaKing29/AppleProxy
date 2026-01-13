@@ -29,7 +29,7 @@ class Proxy
             while (true)
             {
                 Console.WriteLine("Recieved HTTP Request");
-                await ReverseProxy(httpListener.GetContext(), backendUrl);
+                await ReverseProxy(httpListener.GetContext(), backendUrl, clientUrl);
             }
         }
         catch (Exception e)
@@ -38,7 +38,7 @@ class Proxy
         }
     }
 
-    public static async Task ReverseProxy(HttpListenerContext httpListenerContext, string backendUrl)
+    public static async Task ReverseProxy(HttpListenerContext httpListenerContext, string backendUrl, string clientUrl)
     {
         // HttpListener  == Client > Proxy
         // HttpClient == Proxy > Backend
@@ -47,26 +47,32 @@ class Proxy
         {
             HttpClient httpClient = new HttpClient(); // send and recieve HTTP responses
             HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
 
 
-            var clientRequest = httpListenerContext.Request;
-            byte[] buffer = new byte[8192];
-            var request = await clientRequest.InputStream.ReadAsync(buffer, 0, 8192);
+            // turn URI into query, and send back info to client like status code
 
-            var zcxv = await httpClient.GetAsync(backendUrl);
+
+            var clientRequest = httpListenerContext.Request; // correct
+
+            httpRequestMessage.Method = new HttpMethod(clientRequest.HttpMethod); // convert into HttpMethod
+            httpRequestMessage.RequestUri = new Uri(backendUrl);
+            httpRequestMessage.Headers = clientRequest.Headers;
+
             var outputStream = httpListenerResponse.OutputStream;
-            await request.Content.CopyToAsync(outputStream); // send back request to client
+
+            await httpClient.SendAsync(httpRequestMessage); // send back request to client
 
 
-            var header = request.Content.Headers;
+            /* var header = clientRequest.Content.Headers;
 
             var contentType = header.ContentType; // represents media type
             var contentLength = header.ContentLength; // size of message body in bytes
 
 
             // send back the HTTP response code
-            var statusCode = request.StatusCode;
-            httpListenerResponse.StatusCode = (int) statusCode;
+            var statusCode = clientRequest.StatusCode;
+            httpListenerResponse.StatusCode = (int) statusCode; */
 
 
 
