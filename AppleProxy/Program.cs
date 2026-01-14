@@ -40,6 +40,9 @@ class Proxy
 
     public static async Task ReverseProxy(HttpListenerContext httpListenerContext, string backendUrl, string clientUrl)
     {
+
+        // todo: implement http responses
+
         // HttpListener  == Client > Proxy
         // HttpClient == Proxy > Backend
         
