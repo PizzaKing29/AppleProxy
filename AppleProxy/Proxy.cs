@@ -57,7 +57,13 @@ class Proxy
 
             httpRequestMessage.Method = new HttpMethod(clientRequest.HttpMethod); // convert into HttpMethod
             httpRequestMessage.RequestUri = new Uri(BackendUrl);
-            // httpRequestMessage.Headers = clientRequest.Headers;
+
+            foreach(var header in clientRequest.Headers)
+            {
+                
+            }
+
+            httpRequestMessage.Headers = clientRequest.Headers;
 
             var outputStream = httpListenerResponse.OutputStream;
 
