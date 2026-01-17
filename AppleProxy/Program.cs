@@ -8,6 +8,6 @@ class RunProgram
 {
     public static async Task Main()
     {
-
+        await Proxy.StartProxy();
     }
 }
