@@ -58,12 +58,53 @@ class Proxy
             httpRequestMessage.Method = new HttpMethod(clientRequest.HttpMethod); // convert into HttpMethod
             httpRequestMessage.RequestUri = new Uri(BackendUrl);
 
-            foreach(var header in clientRequest.Headers)
+
+            var setHeader = httpRequestMessage;
+            foreach (var header in clientRequest.Headers.AllKeys)
             {
-                
+                var value = clientRequest.Headers[header];
+
+                switch (header)
+                {
+                    case "Host":
+                        setHeader.Headers.Host = value;
+                        break;
+
+                    case "User-Agent":
+                        setHeader.Headers.Add("User-Agent", value);
+                        break;
+
+                    case "Accept":
+                        setHeader.Headers.Add("Accept", value);
+                        break;
+
+                    case "Accept-Encoding":
+                        setHeader.Headers.Add("Accept-Encoding", value);
+                        break;
+
+                    case "Cookie":
+                        setHeader.Headers.Add("Cookie", value);
+                        break;
+
+                    case "Authorization":
+                        setHeader.Headers.Add("Authorization", value);
+                        break;
+
+                    case "Content-Type":
+                        setHeader.Headers.Add("Content-Type", value);
+                        break;
+
+                    case "Content-Length":
+                        setHeader.Headers.Add("Content-Length", value);
+                        break;
+
+                    case "Referer":
+                        setHeader.Headers.Add("Referer", value);
+                        break;
+                }
             }
 
-            httpRequestMessage.Headers = clientRequest.Headers;
+            // httpRequestMessage.Headers = clientRequest.Headers;
 
             var outputStream = httpListenerResponse.OutputStream;
 
