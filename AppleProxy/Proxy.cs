@@ -56,7 +56,7 @@ class Proxy
             var clientRequest = httpListenerContext.Request; // correct
 
             httpRequestMessage.Method = new HttpMethod(clientRequest.HttpMethod); // convert into HttpMethod
-            httpRequestMessage.RequestUri = new Uri(BackendUrl);
+            httpRequestMessage.RequestUri = new Uri($"{BackendUrl}{clientRequest.Url.PathAndQuery}");
 
 
             var setHeader = httpRequestMessage;
@@ -108,18 +108,16 @@ class Proxy
 
             var outputStream = httpListenerResponse.OutputStream;
 
-            await httpClient.SendAsync(httpRequestMessage); // send back request to client
 
-           
-            /* var header = clientRequest.Content.Headers;
-
-            var contentType = header.ContentType; // represents media type
-            var contentLength = header.ContentLength; // size of message body in bytes
-
+            var backendResponse = await httpClient.SendAsync(httpRequestMessage); // backend response
 
             // send back the HTTP response code
-            var statusCode = clientRequest.StatusCode;
-            httpListenerResponse.StatusCode = (int) statusCode; */
+            var statusCode = backendResponse.StatusCode;
+            httpListenerResponse.StatusCode = (int) statusCode;
+
+            // send back request to client
+            var backendResponseStream = await backendResponse.Content.ReadAsStreamAsync();
+            await backendResponseStream.CopyToAsync(httpListenerResponse.OutputStream);
 
 
 
