@@ -40,6 +40,8 @@ class Proxy
         // add port changing
         // all http requests
 
+        // todo: send back HTTP body
+
         // HttpListener  == Client > Proxy
         // HttpClient == Proxy > Backend
 
