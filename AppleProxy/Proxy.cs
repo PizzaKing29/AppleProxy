@@ -51,14 +51,16 @@ class Proxy
             HttpClient httpClient = new HttpClient(); // send and recieve HTTP responses
             HttpListenerResponse httpListenerResponse = httpListenerContext.Response;
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage();
+            HttpListenerRequest httpListenerRequest = httpListenerContext.Request;
 
 
             // turn URI into query, and send back info to client like status code
-            
+
 
             var clientRequest = httpListenerContext.Request; // correct
+            var clientHttpMethod = new HttpMethod(clientRequest.HttpMethod);
 
-            httpRequestMessage.Method = new HttpMethod(clientRequest.HttpMethod); // convert into HttpMethod
+            httpRequestMessage.Method = clientHttpMethod; // convert into HttpMethod
             httpRequestMessage.RequestUri = new Uri($"{BackendUrl}{clientRequest.Url.PathAndQuery}");
 
 
@@ -107,12 +109,19 @@ class Proxy
                 }
             }
 
-            // httpRequestMessage.Headers = clientRequest.Headers;
 
             var outputStream = httpListenerResponse.OutputStream;
 
-
             var backendResponse = await httpClient.SendAsync(httpRequestMessage); // backend response
+
+
+
+            if (httpListenerRequest.HasEntityBody)
+            {
+                // Set HTTP Method
+                httpRequestMessage.Content = httpListenerRequest.InputStream
+            }
+
 
             // send back the HTTP response code
             var statusCode = backendResponse.StatusCode;
@@ -121,7 +130,6 @@ class Proxy
             // send back request to client
             var backendResponseStream = await backendResponse.Content.ReadAsStreamAsync();
             await backendResponseStream.CopyToAsync(httpListenerResponse.OutputStream);
-
 
 
             Console.WriteLine("Sucessfully sent back HTTP response code and the HTTP response");
