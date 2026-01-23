@@ -42,6 +42,7 @@ class Proxy
 
         // todo: send back HTTP body
         // todo: add better error support
+        // improve code
 
         // HttpListener  == Client > Proxy
         // HttpClient == Proxy > Backend
