@@ -40,7 +40,7 @@ class Proxy
         // add port changing
         // all http requests
 
-        // todo: send back HTTP body
+        // todo: send back HTTP body <<
         // todo: add better error support
         // improve code
         // change OOP << continue
